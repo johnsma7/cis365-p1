@@ -49,8 +49,7 @@ def createTeam(firstIndex, secondIndex, isRed,
 ##########
 # Agents #
 ##########
-
-
+    
 class DummyAgent(CaptureAgent):
     """
     A Dummy agent to serve as an example of the necessary agent structure.
@@ -95,21 +94,13 @@ class DummyAgent(CaptureAgent):
         You should change this in your own agent.
         '''
         
-        food = self.getFood(gameState)
-        #print food
-        foodCoords = list()
-        for x in range(len(food.asList()) - 1):
-            for y in range(len(food[0]) - 1):
-                if food[x][y] == True:
-                    foodCoords.append((x, y))
-        
+        foodCoords = self.getFood(gameState).asList()
         startPos = gameState.getAgentPosition(self.index)
         distancer = Distancer(gameState.data.layout)
         foodCoords.sort(key = lambda pos: distancer.getDistance(startPos, pos))
         
         if len(foodCoords) > 0:
             path = aStar(startPos[0], startPos[1], foodCoords[0][0], foodCoords[0][1], gameState)
-            print(path)
             x, y = path[-2].position
             for stop in path:
                 print stop.position
