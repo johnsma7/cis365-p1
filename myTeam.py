@@ -19,6 +19,7 @@ from argparse import Action
 from operator import xor
 import distanceCalculator
 from distanceCalculator import Distancer
+from __builtin__ import True
 
 #################
 # Team creation #
@@ -170,30 +171,37 @@ def aStar(startX, startY, endX, endY, gameState):
             pos = (pos[0]+x, pos[1]+y)
             if pos[0] < maxX and pos[1] < maxY and not gameState.hasWall(pos[0], pos[1]):
                 children.append(Node(pos, parent = currentNode))
-
+        
         for child in children:
-            for closed in closedList:
-                if child.position == closed.position:
+            stop = False
+            for closedN in closedList:
+                if child.position == closedN.position:
+                    stop = True
                     continue
+            if stop:
+                continue
             
             #calculate f
             child.g = currentNode.g + 1
             child.h = ((child.position[0] - endNode.position[0]) ** 2) + ((child.position[1] - endNode.position[1]) ** 2)
             child.calcF()
             
-            for open in openList:
-                if child.position == open.position and child.g > open.g:
+            stop = False
+            for openN in openList:
+                if child.position == openN.position and child.g > openN.g:
+                    stop = True
                     continue
+            if stop:
+                continue
             
             openList.append(child)
-            openList.sort(key=lambda x: (x.f))
-            #print openList
+            
+        openList.sort(key=lambda x: (x.f))
             
 def generatePath(path, n):
     path.append(n)
     if n.parent != None:
         generatePath(path, n.parent)
-    print path
 
 class Node:
     def __init__(self, position, f=0, g=0, h=0, parent=None):
