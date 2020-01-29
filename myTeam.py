@@ -109,7 +109,9 @@ class DummyAgent(CaptureAgent):
         if len(foodCoords) > 0:
             path = aStar(startPos[0], startPos[1], foodCoords[0][0], foodCoords[0][1], gameState)
             print(path)
-            x, y = path[1]
+            x, y = path[-2].position
+            for stop in path:
+                print stop.position
             if x > startPos[0]:
                 return Directions.EAST
             elif x < startPos[0]:
@@ -161,15 +163,14 @@ def aStar(startX, startY, endX, endY, gameState):
        
         #generate children
         children = list()
-        for x in range(-1, 3):
-            for y in range(-1, 3):
-                if x == y == 0:
-                    continue
-                pos = currentNode.position
-                pos = (pos[0]+x, pos[1]+y)
-                if pos[0] < maxX and pos[1] < maxY and not gameState.hasWall(pos[0], pos[1]):
-                    children.append(Node(pos, parent = currentNode))
-        
+        childOffsets = [(1,0), (-1, 0), (0,1), (0,-1)]
+        for offset in childOffsets:
+            x, y = offset
+            pos = currentNode.position
+            pos = (pos[0]+x, pos[1]+y)
+            if pos[0] < maxX and pos[1] < maxY and not gameState.hasWall(pos[0], pos[1]):
+                children.append(Node(pos, parent = currentNode))
+
         for child in children:
             for closed in closedList:
                 if child.position == closed.position:
@@ -185,10 +186,14 @@ def aStar(startX, startY, endX, endY, gameState):
                     continue
             
             openList.append(child)
+            openList.sort(key=lambda x: (x.f))
+            #print openList
             
 def generatePath(path, n):
     path.append(n)
-    generatePath(path, n.parent)
+    if n.parent != None:
+        generatePath(path, n.parent)
+    print path
 
 class Node:
     def __init__(self, position, f=0, g=0, h=0, parent=None):
